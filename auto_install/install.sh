@@ -11,9 +11,10 @@
 # Make sure you have `curl` installed
 
 ######## VARIABLES #########
-pivpnGitUrl="https://github.com/pivpn/pivpn.git"
+#pivpnGitUrl="https://github.com/pivpn/pivpn.git"
+pivpnGitUrl="https://github.com/kbc8894/pivpn.git"
 # Uncomment to checkout a custom branch for local pivpn files
-#pivpnGitBranch="custombranchtocheckout"
+pivpnGitBranch="feature/improve-subnet"
 setupVarsFile="setupVars.conf"
 setupConfigDir="/etc/pivpn"
 tempsetupVarsFile="/tmp/setupVars.conf"
@@ -38,7 +39,7 @@ CHECK_PKG_INSTALLED='dpkg-query -s'
 # Dependencies that are required by the script,
 # regardless of the VPN protocol chosen
 BASE_DEPS=(git tar curl grep dnsutils grepcidr whiptail net-tools)
-BASE_DEPS+=(bsdmainutils bash-completion)
+BASE_DEPS+=(bsdmainutils bash-completion python3-pip)
 
 BASE_DEPS_ALPINE=(git grep bind-tools newt net-tools bash-completion coreutils)
 BASE_DEPS_ALPINE+=(openssl util-linux openrc iptables ip6tables coreutils sed)
@@ -1650,6 +1651,7 @@ installPiVPN() {
     installOpenVPN
     askCustomProto
   elif [[ "${VPN}" == 'wireguard' ]]; then
+    pip3 install -r ${pivpnFilesDir}/scripts/wireguard/tools/requirements.txt
     setWireguardDefaultVars
     installWireGuard
   fi
@@ -1772,6 +1774,7 @@ setWireguardDefaultVars() {
     pivpnNETv6="fd11:5ee:bad:c0de::"
   fi
 
+  python3 ${pivpnFilesDir}/scripts/wireguard/tools/iptools.py init --network ${pivpnNET} --subnet ${subnetClass}
   vpnGw="$(cut -d '.' -f 1-3 <<< "${pivpnNET}").1"
 
   if [[ "${pivpnenableipv6}" -eq 1 ]]; then
