@@ -5,7 +5,8 @@ from heapq import heapify, heappop, heappush
 import ipcalc
 import typer
 
-HEAP_FILE = os.path.join(os.path.dirname(__file__), "heap")
+os.makedirs("/tmp/pivpn", exist_ok=True)
+HEAP_FILE = "/tmp/pivpn/heap"
 app = typer.Typer()
 
 
