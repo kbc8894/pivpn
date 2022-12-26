@@ -1651,7 +1651,7 @@ installPiVPN() {
     installOpenVPN
     askCustomProto
   elif [[ "${VPN}" == 'wireguard' ]]; then
-    pip3 install -r ${pivpnFilesDir}/scripts/wireguard/tools/requirements.txt
+    ${SUDO} pip3 install -r ${pivpnFilesDir}/scripts/wireguard/tools/requirements.txt
     setWireguardDefaultVars
     installWireGuard
   fi
