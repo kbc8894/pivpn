@@ -109,6 +109,8 @@ for CLIENT_NAME in "${CLIENTS_TO_REMOVE[@]}"; do
       PUBLIC_KEY="$(grep "^${CLIENT_NAME} " configs/clients.txt \
         | awk '{print $2}')"
 
+      python3 /opt/pivpn/wireguard/tools/iptools.py deassign --id ${COUNT}
+
       # Then remove the client matching the variables above
       sed \
         -e "\#${CLIENT_NAME} ${PUBLIC_KEY} ${CREATION_DATE} ${COUNT}#d" \

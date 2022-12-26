@@ -5,8 +5,8 @@ from heapq import heapify, heappop, heappush
 import ipcalc
 import typer
 
-os.makedirs("/tmp/pivpn", exist_ok=True)
-HEAP_FILE = "/tmp/pivpn/heap"
+os.makedirs("/tmp/iptools", exist_ok=True)
+HEAP_FILE = "/tmp/iptools/heap"
 app = typer.Typer()
 
 
@@ -18,9 +18,12 @@ def assign(
     with open(HEAP_FILE, "rb") as f:
         heap = pickle.load(f)
 
+    if not heap:
+        print(-1, -1)
+
     id = heappop(heap)
     net = ipcalc.Network(f"{network}/{subnet}")
-    print(net[id], end="")
+    print(id, net[id], end="")
     with open(HEAP_FILE, "wb") as f:
         pickle.dump(heap, f)
 

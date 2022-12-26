@@ -113,6 +113,13 @@ else
   checkName
 fi
 
+RET="$(python3 /opt/pivpn/wireguard/tools/iptools.py assign --network ${pivpnNET} --subnet ${subnetClass})"
+COUNT="$(echo $RET | awk '{print $1}')"
+CLIENT_IP="$(echo $RET | awk '{print $2}')"
+if [ ${COUNT} -eq "-1" ]; then
+  exit
+fi
+
 wg genkey \
   | tee "keys/${CLIENT_NAME}_priv" \
   | wg pubkey > "keys/${CLIENT_NAME}_pub"
@@ -120,14 +127,17 @@ wg genpsk | tee "keys/${CLIENT_NAME}_psk" &> /dev/null
 echo "::: Client Keys generated"
 
 # Find an unused number for the last octet of the client IP
-for i in {2..254}; do
-  if ! grep -q " ${i}$" configs/clients.txt; then
-    COUNT="${i}"
-    echo "${CLIENT_NAME} $(< keys/"${CLIENT_NAME}"_pub) $(date +%s) ${COUNT}" \
-      | tee -a configs/clients.txt > /dev/null
-    break
-  fi
-done
+# for i in {2..254}; do
+#   if ! grep -q " ${i}$" configs/clients.txt; then
+#     COUNT="${i}"
+#     echo "${CLIENT_NAME} $(< keys/"${CLIENT_NAME}"_pub) $(date +%s) ${COUNT}" \
+#       | tee -a configs/clients.txt > /dev/null
+#     break
+#   fi
+# done
+
+echo "${CLIENT_NAME} $(< keys/"${CLIENT_NAME}"_pub) $(date +%s) ${COUNT}" | tee -a configs/clients.txt > /dev/null
+
 
 # Disabling SC2154, variables sourced externaly
 # shellcheck disable=SC2154
@@ -137,7 +147,8 @@ NET_REDUCED="${pivpnNET::-2}"
 {
   echo '[Interface]'
   echo "PrivateKey = $(cat "keys/${CLIENT_NAME}_priv")"
-  echo -n "Address = ${NET_REDUCED}.${COUNT}/${subnetClass}"
+  #echo -n "Address = ${NET_REDUCED}.${COUNT}/${subnetClass}"
+  echo -n "Address = ${CLIENT_IP}/${subnetClass}"
 
   if [[ "${pivpnenableipv6}" == 1 ]]; then
     echo ",${pivpnNETv6}${COUNT}/${subnetClassv6}"
@@ -172,7 +183,8 @@ echo "::: Client config generated"
   echo '[Peer]'
   echo "PublicKey = $(cat "keys/${CLIENT_NAME}_pub")"
   echo "PresharedKey = $(cat "keys/${CLIENT_NAME}_psk")"
-  echo -n "AllowedIPs = ${NET_REDUCED}.${COUNT}/32"
+  #echo -n "AllowedIPs = ${NET_REDUCED}.${COUNT}/32"
+  echo -n "AllowedIPs = ${CLIENT_IP}/32"
 
   if [[ "${pivpnenableipv6}" == 1 ]]; then
     echo ",${pivpnNETv6}${COUNT}/128"
