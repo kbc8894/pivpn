@@ -1775,7 +1775,7 @@ setWireguardDefaultVars() {
   fi
 
   python3 ${pivpnFilesDir}/scripts/wireguard/tools/iptools.py init --network ${pivpnNET} --subnet ${subnetClass}
-  vpnGW="$(python3 ${pivpnFilesDir}/scripts/wireguard/tools/iptools.py assign --network ${pivpnNET} --subnet ${subnetClass} | awk '{print $2}')"
+  vpnGw="$(python3 ${pivpnFilesDir}/scripts/wireguard/tools/iptools.py assign --network ${pivpnNET} --subnet ${subnetClass} | awk '{print $2}')"
 
   #vpnGw="$(cut -d '.' -f 1-3 <<< "${pivpnNET}").1"
 
