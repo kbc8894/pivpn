@@ -1774,6 +1774,7 @@ setWireguardDefaultVars() {
     pivpnNETv6="fd11:5ee:bad:c0de::"
   fi
 
+  ${SUDO} chmod 777 ${pivpnFilesDir}/scripts/wireguard/tools/
   python3 ${pivpnFilesDir}/scripts/wireguard/tools/iptools.py init --network ${pivpnNET} --subnet ${subnetClass}
   vpnGw="$(python3 ${pivpnFilesDir}/scripts/wireguard/tools/iptools.py assign --network ${pivpnNET} --subnet ${subnetClass} | awk '{print $2}')"
 
